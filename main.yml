@@ -20,4 +20,4 @@
 
     - setup:
   roles:
-    - configure-server
+    - setup
