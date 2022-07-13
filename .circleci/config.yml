@@ -19,8 +19,21 @@ jobs:
                 --stack-name myStack-${CIRCLE_WORKFLOW_ID:0:5} \
                 --region us-east-1
         - run:
+            name: create inventory
+            command: echo "[all]" > ~/inventory
+
+        - run:
             name: Get IP into inventory
             command: |
+              aws ec2 describe-instances \
+                --query 'Reservations[*].Instances[*].PublicIpAddress' \
+                --filters "Name=tag:Project,Values=udacity" \
+                --output text >> ~/inventory
+
+        - save_cache:
+          key: my-inventory
+          paths:
+            - ~/inventory
 
   configure_infrastructure: 
     docker:
@@ -34,10 +47,12 @@ jobs:
           name: Install Ansible
           command: |
             apk add --update ansible
+      - restore_cache:
+          key: my-inventory
       - run:
           name: Run Playbook and Configure server
           command: |
-            ansible-playbook -i inventory.txt main.yml
+            ansible-playbook -i ~/inventory main.yml
 
   smoke_test:
     docker:
