@@ -31,9 +31,9 @@ jobs:
                 --output text >> ~/inventory
 
         - save_cache:
-          key: my-inventory
-          paths:
-            - ~/inventory
+            key: my-inventory
+            paths:
+              - ~/inventory
 
   configure_infrastructure: 
     docker:
